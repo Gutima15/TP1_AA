@@ -1,0 +1,6 @@
+Este es un archivo de texto que tiene el fin de ser prueba para el uso de 
+gitKraken.
+Por favor borrar los siguientes números para modificar el archivo. 
+468743468456
+PD Link de la página donde sacámos el código de la tarde... o al menos sirvió como
+referencia: http://algoimagen.blogspot.com/2013/08/java-abrir-imagen-leer-pixeles-y-pasar.html
