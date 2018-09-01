@@ -1,6 +1,0 @@
-Este es un archivo de texto que tiene el fin de ser prueba para el uso de 
-gitKraken.
-Por favor borrar los siguientes n�meros para modificar el archivo. Link de la p�gina donde sac�mos el c�digo de la tarde... o al menos sirvi� como
-referencia: http://algoimagen.blogspot.com/2013/08/java-abrir-imagen-leer-pixeles-y-pasar.html
-Editado
-Edite esta vara...
