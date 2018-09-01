@@ -17,7 +17,6 @@ public class Functions {
 			for(int j = 0;j<image.getHeight();j++) {
 				Color colorP = new Color(image.getRGB(i, j));
 				Color colorQ = new Color(goalImage.getRGB(i, j));
-				
 				double promP = (colorP.getBlue() + colorP.getGreen() + colorP.getRed())/3;
 				double promQ = (colorQ.getBlue() + colorQ.getGreen() + colorQ.getRed())/3;
 			    int RP = colorP.getRed();
@@ -27,8 +26,10 @@ public class Functions {
 			    int BQ = colorQ.getBlue();
 				int GQ = colorQ.getGreen();
 				sum = sum + ((Math.pow(promP-promQ, 2))/(width*height));
-			    
 			    System.out.println("B:"+BP+" R:"+RP+" G:"+GP+"   B:"+BQ+" R:"+RQ+" G:"+GQ +" PromP: "+promP+" PromQ: "+promQ);
+			    /*
+			     * THIS IS A TEST, IT MIGHT WORK
+			     */
 			    
 			}	
 		}
