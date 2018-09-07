@@ -11,18 +11,25 @@ import javax.imageio.ImageIO;
 public class Experiment {
 
 	public static void main(String[] args) {
-		Factory factory = new Factory();
+		
+		SimilitaryAlgorithm calculator = new Euclidian();
 		//factory.getRandomPicture(32,32,100,"C:\\Users\\josue\\Dropbox\\SEMESTRE 2 2018\\Analisis de Algoritmos\\Progra1\\Pictures\\");
 		try {
-			BufferedImage image1 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\negra2.jpg"));
-			BufferedImage image2 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\blanca2.jpg"));
-			Functions functions = new Functions();
-			System.out.println(functions.euclidianFunction(image1, image2));
+			BufferedImage image1 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\goal.jpg"));
+			BufferedImage image2 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\negra.jpg"));
+			System.out.println(calculator.calculate(image1, image2));
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			System.out.println("ERROR");
 		}
+		/*
+		File directory;
+		for(int i = 1;i<101;i++) {
+			directory = new File("C:\\Users\\josue\\Documents\\PRUEBAS_VAN_GOGH\\Gen"+i);
+			directory.mkdir();
+		}
+		*/
 	}
 
 }
