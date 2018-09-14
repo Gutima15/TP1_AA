@@ -5,31 +5,39 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchProviderException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Experiment {
 
 	public static void main(String[] args) {
-		
-		SimilitaryAlgorithm calculator = new Euclidian();
-		//factory.getRandomPicture(32,32,100,"C:\\Users\\josue\\Dropbox\\SEMESTRE 2 2018\\Analisis de Algoritmos\\Progra1\\Pictures\\");
-		try {
-			BufferedImage image1 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\goal.jpg"));
-			BufferedImage image2 = ImageIO.read(new File("C:\\Users\\josue\\Desktop\\negra.jpg"));
-			System.out.println(calculator.calculate(image1, image2));
-			
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.out.println("ERROR");
-		}
-		/*
-		File directory;
-		for(int i = 1;i<101;i++) {
-			directory = new File("C:\\Users\\josue\\Documents\\PRUEBAS_VAN_GOGH\\Gen"+i);
-			directory.mkdir();
-		}
-		*/
+		Beginner beginner = new Beginner();
+		beginner.start();
 	}
 
+}
+
+class Beginner extends Thread{
+	
+	public void run() {
+		
+		for(int i = 0; i < 30;i++) {
+			System.out.println(i);
+			
+			try{
+				Thread.sleep(300);
+			}catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		System.out.println("End");
+		
+	}
 }
