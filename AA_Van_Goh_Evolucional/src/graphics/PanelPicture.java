@@ -13,6 +13,11 @@ public class PanelPicture extends JPanel{
 
 	private Image image;
 	
+	public PanelPicture() {
+		setLayout(null);
+		setPreferredSize(new Dimension(128,128));
+		setBackground(Color.WHITE);
+	}
 	public PanelPicture(Image image) {
 		searchImages();
 		setLayout(null);

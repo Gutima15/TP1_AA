@@ -13,9 +13,12 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import logic.Canberra;
 import logic.Euclidian;
 import logic.Experiment;
 import logic.Factory;
+import logic.MyImage;
+import logic.RGBSimilarity;
 import logic.SimilitaryAlgorithm;
 import logic.Simulation;
 
@@ -53,6 +56,7 @@ public class MainFrame extends JFrame {
 	private JTextField gensField;
 	private JTextField popField;
 	private Image play;
+	private Image update;
 	private JLabel labelPercentage;
 	private ButtonGroup group;
 	private JRadioButton buttonF1;
@@ -60,6 +64,7 @@ public class MainFrame extends JFrame {
 	private JRadioButton buttonF3;
 	private JButton buttonSelect;
 	private JButton playButton;
+	private JButton buttonUpdate;
 	private PanelPicture panelGoalPicture;
 	private PanelPicture panelCurrentPicture;
 	private Factory factory;
@@ -68,6 +73,7 @@ public class MainFrame extends JFrame {
 	private BufferedImage goalImage;
 	private int generations;
 	private int population;
+	private Simulation simulation;
 	
 	private SimilitaryAlgorithm calculator;
 
@@ -108,7 +114,7 @@ public class MainFrame extends JFrame {
 		graphicWindow.setViewportView(graphic);
 		contentPane.add(graphicWindow);
 		
-		panelPictures = new PanelPictures(530,new ArrayList<BufferedImage>(),new ArrayList<String>());
+		panelPictures = new PanelPictures(530,new ArrayList<MyImage>(),new ArrayList<String>());
 		panelPictures.setBackground(new Color(9,32,85));
 		
 		imagesWindow = new JScrollPane();
@@ -190,14 +196,14 @@ public class MainFrame extends JFrame {
 		buttonF1.setSelected(true);
 		contentPane.add(buttonF1);
 		
-		buttonF2 = new JRadioButton("ALGORITHM 2");
+		buttonF2 = new JRadioButton("CANBERRA");
 		buttonF2.setForeground(Color.GREEN);
 		buttonF2.setFont(new Font("Tahoma", Font.BOLD, 20));
-		buttonF2.setBounds(1084, 150, 205, 23);
+		buttonF2.setBounds(1084, 150, 142, 23);
 		buttonF2.setBackground(new Color(50,50,50));
 		contentPane.add(buttonF2);
 		
-		buttonF3 = new JRadioButton("ALGORITHM 3");
+		buttonF3 = new JRadioButton("RGB SIMILARITY");
 		buttonF3.setForeground(Color.GREEN);
 		buttonF3.setFont(new Font("Tahoma", Font.BOLD, 20));
 		buttonF3.setBounds(1084, 195, 205, 23);
@@ -257,6 +263,35 @@ public class MainFrame extends JFrame {
 		checkBox.setFont(new Font("Tahoma", Font.BOLD, 20));
 		checkBox.setBounds(1084, 50, 205, 23);
 		contentPane.add(checkBox);
+		
+		buttonUpdate = new JButton(new ImageIcon(update));
+		buttonUpdate.setBounds(783, 50, 81, 75);
+		buttonUpdate.setBackground(Color.CYAN);
+		
+		buttonUpdate.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				updatePercentage("0%");
+				updateGraphic(new ArrayList<Integer>());
+				updatePanelPictures(new ArrayList<MyImage>(),new ArrayList<String>());
+				imageSelected = false;
+				goalImage = null;
+				
+				panelGoalPicture = new PanelPicture();
+				contentPane.add(panelGoalPicture);
+				panelGoalPicture.setBounds(50, 50, 128, 128);
+				
+				panelCurrentPicture = new PanelPicture();
+				contentPane.add(panelCurrentPicture);
+				panelCurrentPicture.setBounds(472, 50, 128, 128);
+				
+				gensField.setText("");
+				popField.setText("");
+				
+				simulation = new Simulation(new MainFrame(),calculator,null,0,0,0);
+			}
+		});
+		
+		contentPane.add(buttonUpdate);
 	}
 
 	private void setDefaultValues() 
@@ -278,6 +313,7 @@ public class MainFrame extends JFrame {
 	{
 		try {
 			play = ImageIO.read(new File("play.png"));
+			update = ImageIO.read(new File("update.png"));
 		}
 		catch(IOException e) {
 			System.out.println("Imagen no encontrada");
@@ -310,19 +346,17 @@ public class MainFrame extends JFrame {
 		if(buttonF1.isSelected() == true){
 		    calculator = new Euclidian();	
 		}
-		if(buttonF1.isSelected() == true){
-		    calculator = new Euclidian();	
+		if(buttonF2.isSelected() == true){
+		    calculator = new Canberra();	
 		}
-		if(buttonF1.isSelected() == true){
-		    calculator = new Euclidian();	
+		if(buttonF3.isSelected() == true){
+		    calculator = new RGBSimilarity();	
 		}
 	}
 	
 	public boolean isNumeric(String chain) 
 	{
-
         boolean result;
-
         try {
             Integer.parseInt(chain);
             result = true;
@@ -338,7 +372,7 @@ public class MainFrame extends JFrame {
 		if(checkBox.isSelected() == true) {
 			useGray = 1;
 		}
-		Simulation simulation = new Simulation(this,calculator,goalImage,generations,population,useGray);
+		simulation = new Simulation(this,calculator,goalImage,generations,population,useGray);
 		simulation.start();
 	}
 	public BufferedImage searchImage(String address) {
@@ -364,7 +398,7 @@ public class MainFrame extends JFrame {
 		graphic.setBackground(new Color(9,32,85));
 		graphicWindow.setViewportView(graphic);
 	}
-	public void updatePanelPictures(ArrayList<BufferedImage> images,ArrayList<String> names) {
+	public void updatePanelPictures(ArrayList<MyImage> images,ArrayList<String> names) {
 		panelPictures = new PanelPictures(530,images,names);
 		panelPictures.setBackground(new Color(9,32,85));
 		imagesWindow.setViewportView(panelPictures);

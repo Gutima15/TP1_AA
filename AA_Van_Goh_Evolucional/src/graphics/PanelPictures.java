@@ -10,14 +10,16 @@ import java.util.ArrayList;
 
 import javax.swing.JPanel;
 
+import logic.MyImage;
+
 public class PanelPictures extends JPanel {
 
-	private ArrayList<BufferedImage> images;
+	private ArrayList<MyImage> images;
 	private ArrayList<String> names;
 	private int x;
 	private int y;
 	
-	public PanelPictures(int x, ArrayList<BufferedImage> candidates,ArrayList<String> names) {
+	public PanelPictures(int x, ArrayList<MyImage> candidates,ArrayList<String> names) {
         this.x = x;
         this.y = (1+(candidates.size()/3))*180;
         images = candidates;
@@ -33,20 +35,20 @@ public class PanelPictures extends JPanel {
 		int yDraw = 20;
 		g.setFont(new Font("Tahoma", Font.BOLD, 18));
 		for(int n = 0;n < images.size();n++) {
-			currentImage = images.get(n);
+			currentImage = images.get(n).getImage();
 		    currentName = names.get(n);
-		    //int m = Math.abs  
+		    int m = Math.abs(n-images.size());  
 		    if(n%3 == 0) {
 		    	g.drawImage(currentImage, 20, yDraw, 128, 128, null);
-		    	g.drawString("gen"+n+"_"+currentName, 20, yDraw +150);
+		    	g.drawString("gen"+m+"_"+currentName, 20, yDraw +150);
 		    }
 		    if(n%3 == 1) {
 		    	g.drawImage(currentImage, 180, yDraw, 128, 128, null);
-		    	g.drawString("gen"+n+"_"+currentName, 180, yDraw +150);
+		    	g.drawString("gen"+m+"_"+currentName, 180, yDraw +150);
 		    }
 		    if(n%3 == 2) {
 		    	g.drawImage(currentImage, 350, yDraw, 128, 128, null);
-		    	g.drawString("gen"+n+"_"+currentName, 350, yDraw +150);
+		    	g.drawString("gen"+m+"_"+currentName, 350, yDraw +150);
 		    	yDraw = yDraw+180;
 		    }
 		}

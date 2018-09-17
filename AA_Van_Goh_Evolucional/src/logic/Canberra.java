@@ -1,14 +1,14 @@
 package logic;
-
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
-public class Euclidian extends SimilitaryAlgorithm{
-
+public class Canberra extends SimilitaryAlgorithm{
+    
 	public Double calculate(BufferedImage goalImage,BufferedImage image) {
+		Graphics p = image.getGraphics();
+		Graphics q = goalImage.getGraphics();
 		double sum = 0.0;
 		double width = image.getWidth();
 		double height = image.getHeight();	
@@ -24,11 +24,33 @@ public class Euclidian extends SimilitaryAlgorithm{
 				int GQ = colorQ.getGreen();
 				double promP = (RP + BP + GP)/3;
 				double promQ = (RQ + BQ + GQ)/3;
-				sum = sum + ((Math.pow((promP-promQ), 2))/(width*height));
+	            double abs =Math.abs(promP-promQ);
+	            double down = promP + promQ;
+	            if(down == 0) {
+	            	down++;
+	            }
+	            sum = (sum+(abs/down));
 			}	
 		}
 		DecimalFormat df = new DecimalFormat("#.##");   
-		return Math.abs(Double.valueOf(df.format(((((Math.sqrt(sum))*100)/255)-100))));
+	    double value= Math.abs(Double.valueOf((df.format((sum/(width*height)*100)-100))));
+		return value;
+            
 	}
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
