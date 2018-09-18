@@ -40,7 +40,9 @@ public class Factory {
 		return image;
 	}
 	
-	public BufferedImage crossImages8x8(BufferedImage image1,BufferedImage image2) {
+	public MyImage cross8x8(MyImage myImage1,MyImage myImage2) {
+		BufferedImage image1 = myImage1.getImage();
+		BufferedImage image2 = myImage2.getImage();
 		BufferedImage result = new BufferedImage(image1.getWidth(),image1.getHeight(),BufferedImage.TYPE_INT_RGB);
 		Graphics g = result.getGraphics();
 		for(int i = 0;i<image1.getWidth();i++) {
@@ -65,7 +67,7 @@ public class Factory {
 				}
 			}	
 		}
-		return result;
+		return new MyImage(result,4);
 	}
 	public MyImage cross32x32(MyImage myImage1,MyImage myImage2) {
 		BufferedImage image1 = myImage1.getImage();
@@ -97,10 +99,10 @@ public class Factory {
 		return new MyImage(result,4);
 	}
 
-	public MyImage crossBestImages(MyImage image1, MyImage image2) 
+	public MyImage crossBestImages(MyImage image1, MyImage image2, int sectors) 
 	{
 		int R = (int)(Math.random() * 2);
-		int R2 = (int)(Math.random() * 4);
+		int R2 = (int)(Math.random() * 5);
 		if(R2 == 0) {
 			if(R == 0) {
 				return cross32x32(image2,image1);
@@ -109,12 +111,20 @@ public class Factory {
 	            return cross32x32(image1,image2);
 			}	
 		}
-		else {
+		else if(R2 == 1) {
 			if(R == 0) {
 				return cross8x8(image2,image1);
 			}
 	        if(R == 1) {
 	            return cross8x8(image1,image2);
+			}
+		}
+		else {
+			if(R == 0) {
+				return crossSectorized(image2,image1,sectors);
+			}
+	        if(R == 1) {
+	            return crossSectorized(image1,image2,sectors);
 			}	
 		}
         return null;
@@ -453,7 +463,41 @@ public class Factory {
 		return new MyImage(result,2);
 	}
 	
-	public MyImage cross8x8(MyImage myImage1,MyImage myImage2) {
+	public MyImage crossDirected(MyImage myImage1, MyImage myImage2, MyImage myGoal) {
+		BufferedImage image1 = myImage1.getImage();
+		BufferedImage image2 = myImage2.getImage();
+		BufferedImage goalImage = myGoal.getImage();
+		BufferedImage result = new BufferedImage(image1.getWidth(),image1.getHeight(),BufferedImage.TYPE_INT_RGB);
+		Graphics g = result.getGraphics();
+		for(int i = 0;i<image1.getWidth();i++) {
+			for(int j = 0;j<image1.getHeight();j++) {
+				Color colorP = new Color(image1.getRGB(i, j));
+				Color colorQ = new Color(image2.getRGB(i, j));
+				Color colorG = new Color(goalImage.getRGB(i, j));
+			    int RP = colorP.getRed();
+			    int BP = colorP.getBlue();
+				int GP = colorP.getGreen();
+				int RQ = colorQ.getRed();
+			    int BQ = colorQ.getBlue();
+				int GQ = colorQ.getGreen();
+				int RG = colorG.getRed();
+			    int BG = colorG.getBlue();
+				int GG = colorG.getGreen();
+				g.setColor(new Color(getBest(RP,RQ,RG),getBest(GP,GQ,GG),getBest(BP,BQ,BG)));
+				g.fillRect(i, j, 1, 1);
+			}
+		}	
+		return new MyImage(result,4);
+	}
+	private int getBest(int color1,int color2, int colorMeta) {
+		if(Math.abs(colorMeta-color1)<=Math.abs(colorMeta-color2)) {
+			return color1;
+		}
+		else {
+			return color2;
+		}
+	}
+	public MyImage crossSectorized(MyImage myImage1,MyImage myImage2, int sectors) {
 		BufferedImage image1 = myImage1.getImage();
 		BufferedImage image2 = myImage2.getImage();
 		BufferedImage result = new BufferedImage(image1.getWidth(),image2.getHeight(),BufferedImage.TYPE_INT_RGB);
@@ -462,12 +506,12 @@ public class Factory {
 		Double matrix2[][] = myImage2.getMatrix();
 		int x;
 		int y;
-		int c = (image1.getWidth()/8)-1;
+		int c = (image1.getWidth()/sectors)-1;
 		//System.out.println("c: "+c);
-		for(int i = 0;i<8;i++) {
-			for(int j = 0;j<8;j++) {
-				x = ((i+1)*(image1.getWidth()/8)-1);
-				y = ((j+1)*(image1.getWidth()/8)-1);
+		for(int i = 0;i<sectors;i++) {
+			for(int j = 0;j<sectors;j++) {
+				x = ((i+1)*(image1.getWidth()/sectors)-1);
+				y = ((j+1)*(image1.getWidth()/sectors)-1);
 				//System.out.println("x: "+x+" y: "+y);
 				for(int m = x-c;m<=x;m++) {
 					for(int n = y-c;n<=y;n++) {
@@ -486,24 +530,8 @@ public class Factory {
 				
 			}	
 		}
-		return new MyImage(result,2);
+		return new MyImage(result,sectors);
 	}
-	
-    public BufferedImage grayScale(BufferedImage image)
-    {
-        int mediaPixel,colorSRGB;
-        Color colorAux;
-        for( int i = 0; i < image.getWidth(); i++ ){
-            for( int j = 0; j < image.getHeight(); j++ ){
-                colorAux=new Color(image.getRGB(i, j));
-                mediaPixel=(int)((colorAux.getRed()+colorAux.getGreen()+colorAux.getBlue())/3);
-                colorSRGB=(mediaPixel << 16) | (mediaPixel << 8) | mediaPixel;
-                image.setRGB(i, j,colorSRGB);
-            }
-        }
-        
-        return image;
-    }
     
     public BufferedImage openImage()
     {

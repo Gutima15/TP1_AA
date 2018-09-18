@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import logic.Canberra;
+import logic.Cronometer;
 import logic.Euclidian;
 import logic.Experiment;
 import logic.Factory;
@@ -41,6 +42,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.Action;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 
 public class MainFrame extends JFrame {
 
@@ -57,7 +59,9 @@ public class MainFrame extends JFrame {
 	private JTextField popField;
 	private Image play;
 	private Image update;
+	private Image stop;
 	private JLabel labelPercentage;
+	private JLabel labelTime;
 	private ButtonGroup group;
 	private JRadioButton buttonF1;
 	private JRadioButton buttonF2;
@@ -69,14 +73,20 @@ public class MainFrame extends JFrame {
 	private PanelPicture panelCurrentPicture;
 	private Factory factory;
 	private JCheckBox checkBox;
+	private JButton buttonStop;
 	
 	private BufferedImage goalImage;
 	private int generations;
 	private int population;
 	private Simulation simulation;
+	private Cronometer cronometer;
 	
 	private SimilitaryAlgorithm calculator;
+	private JComboBox<Integer> sectors;
+	private int selectedSector;
 
+	private JCheckBox useGoalImage;
+	
 	public static void main(String[] args) 
 	{
 		EventQueue.invokeLater(new Runnable() {
@@ -163,7 +173,7 @@ public class MainFrame extends JFrame {
 		
 		labelPercentage = new JLabel("0%");
 		labelPercentage.setFont(new Font("Tahoma", Font.BOLD, 20));
-		labelPercentage.setForeground(Color.GREEN);
+		labelPercentage.setForeground(Color.CYAN);
 		labelPercentage.setBounds(263, 94, 125, 31);
 		contentPane.add(labelPercentage);
 		
@@ -175,6 +185,8 @@ public class MainFrame extends JFrame {
 				boolean beginner = validateInputs();
 				if(beginner == true && imageSelected == true) {
 					runSimulation();
+					playButton.setEnabled(false);
+					buttonSelect.setEnabled(false);
 				}
 				else {
 					JOptionPane.showMessageDialog(null,"Datos de entrada invalidos","ERROR",JOptionPane.ERROR_MESSAGE);
@@ -182,16 +194,15 @@ public class MainFrame extends JFrame {
 			}
 		});
 		
-		playButton.setBackground(Color.GREEN);
-		playButton.setBounds(689, 50, 81, 75);
+		playButton.setBackground(Color.CYAN);
+		playButton.setBounds(689, 50, 38, 36);
 		contentPane.add(playButton);
-		
 		group = new ButtonGroup();
 		
 		buttonF1 = new JRadioButton("EUCLIDIAN");
 		buttonF1.setForeground(Color.GREEN);
 		buttonF1.setFont(new Font("Tahoma", Font.BOLD, 20));
-		buttonF1.setBounds(1084, 102, 142, 23);
+		buttonF1.setBounds(1084, 120, 142, 23);
 		buttonF1.setBackground(new Color(50,50,50));
 		buttonF1.setSelected(true);
 		contentPane.add(buttonF1);
@@ -199,14 +210,14 @@ public class MainFrame extends JFrame {
 		buttonF2 = new JRadioButton("CANBERRA");
 		buttonF2.setForeground(Color.GREEN);
 		buttonF2.setFont(new Font("Tahoma", Font.BOLD, 20));
-		buttonF2.setBounds(1084, 150, 142, 23);
+		buttonF2.setBounds(1084, 146, 142, 23);
 		buttonF2.setBackground(new Color(50,50,50));
 		contentPane.add(buttonF2);
 		
 		buttonF3 = new JRadioButton("RGB SIMILARITY");
 		buttonF3.setForeground(Color.GREEN);
 		buttonF3.setFont(new Font("Tahoma", Font.BOLD, 20));
-		buttonF3.setBounds(1084, 195, 205, 23);
+		buttonF3.setBounds(1084, 175, 205, 23);
 		buttonF3.setBackground(new Color(50,50,50));
 		contentPane.add(buttonF3);
 		
@@ -261,18 +272,20 @@ public class MainFrame extends JFrame {
 		checkBox.setForeground(Color.CYAN);
 		checkBox.setBackground(new Color(50,50,50));
 		checkBox.setFont(new Font("Tahoma", Font.BOLD, 20));
-		checkBox.setBounds(1084, 50, 205, 23);
+		checkBox.setBounds(689, 102, 205, 23);
 		contentPane.add(checkBox);
 		
 		buttonUpdate = new JButton(new ImageIcon(update));
-		buttonUpdate.setBounds(783, 50, 81, 75);
+		buttonUpdate.setBounds(775, 50, 38, 36);
 		buttonUpdate.setBackground(Color.CYAN);
 		
-		buttonUpdate.addActionListener(new ActionListener() {
+		buttonUpdate.addActionListener(new ActionListener() 
+		{
 			public void actionPerformed(ActionEvent e) {
 				updatePercentage("0%");
 				updateGraphic(new ArrayList<Integer>());
 				updatePanelPictures(new ArrayList<MyImage>(),new ArrayList<String>());
+				updateCronometer(0,0);
 				imageSelected = false;
 				goalImage = null;
 				
@@ -286,12 +299,58 @@ public class MainFrame extends JFrame {
 				
 				gensField.setText("");
 				popField.setText("");
-				
-				simulation = new Simulation(new MainFrame(),calculator,null,0,0,0);
+				labelTime.setForeground(Color.CYAN);
+				simulation.stop();
+				cronometer.stop();
+				playButton.setEnabled(true);
+				buttonSelect.setEnabled(true);
 			}
 		});
 		
 		contentPane.add(buttonUpdate);
+		
+		buttonStop = new JButton(new ImageIcon(stop));
+		buttonStop.setBounds(732, 50, 38, 36);
+		buttonStop.setBackground(Color.CYAN);
+		buttonStop.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent e) {
+				cronometer.stop();
+				simulation.stop();
+				labelTime.setForeground(Color.RED);
+				buttonSelect.setEnabled(true);
+				playButton.setEnabled(true);
+			}
+		});
+		contentPane.add(buttonStop);
+		
+		labelTime = new JLabel("Time: 00:00");
+		labelTime.setBounds(1084, 50, 205, 51);
+		labelTime.setFont(new Font("Tahoma", Font.BOLD, 30));
+		labelTime.setForeground(Color.CYAN);
+		contentPane.add(labelTime);
+		
+		sectors = new JComboBox<Integer>();
+		sectors.setBounds(1219, 219, 70, 20);
+		sectors.addItem(2);
+		sectors.addItem(4);
+		sectors.addItem(8);
+		sectors.addItem(16);
+		contentPane.add(sectors);
+		
+		JLabel lblSectors = new JLabel("SECTORS:");
+		lblSectors.setBounds(1084, 216, 113, 23);
+		lblSectors.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblSectors.setForeground(Color.CYAN);
+		lblSectors.setBackground(new Color(50,50,50));
+		contentPane.add(lblSectors);
+		
+		useGoalImage = new JCheckBox("USE GOAL IMAGE WHEN CROSSING");
+		useGoalImage.setBounds(689, 136, 319, 23);
+		useGoalImage.setForeground(Color.CYAN);
+		useGoalImage.setBackground(new Color(50,50,50));
+		useGoalImage.setFont(new Font("Tahoma", Font.BOLD, 16));
+		contentPane.add(useGoalImage);
 	}
 
 	private void setDefaultValues() 
@@ -314,9 +373,10 @@ public class MainFrame extends JFrame {
 		try {
 			play = ImageIO.read(new File("play.png"));
 			update = ImageIO.read(new File("update.png"));
+			stop = ImageIO.read(new File("stop.png"));
 		}
 		catch(IOException e) {
-			System.out.println("Imagen no encontrada");
+			//System.out.println("Imagen no encontrada");
 		}
 	}
 	
@@ -369,21 +429,19 @@ public class MainFrame extends JFrame {
 	
 	public void runSimulation() {
 		int useGray = 0;
+		int useGoal = 0;
+		selectedSector = (int) sectors.getSelectedItem();
 		if(checkBox.isSelected() == true) {
 			useGray = 1;
 		}
-		simulation = new Simulation(this,calculator,goalImage,generations,population,useGray);
+		if(useGoalImage.isSelected() == true) {
+			useGoal = 1;
+		}
+		simulation = new Simulation(this,calculator,goalImage,generations,population,useGray,selectedSector,useGoal);
+		cronometer = new Cronometer(this);
+		labelTime.setForeground(Color.CYAN);
 		simulation.start();
-	}
-	public BufferedImage searchImage(String address) {
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(new File(address));
-		}
-		catch(IOException e) {
-			System.out.println("Imagen no encontrada");
-		}
-		return image;
+		cronometer.start();
 	}
 	public void updateCurrentImage(BufferedImage currentImage) {
 		panelCurrentPicture = new PanelPicture(currentImage);
@@ -402,6 +460,24 @@ public class MainFrame extends JFrame {
 		panelPictures = new PanelPictures(530,images,names);
 		panelPictures.setBackground(new Color(9,32,85));
 		imagesWindow.setViewportView(panelPictures);
+	}
+	public void updateCronometer(int mins, int secs) {
+		String m = mins+"";
+		String s = secs+"";
+		if(mins<10) {
+			m = "0"+m;
+		}
+		if(secs<10) {
+			s = "0"+s;
+		}
+		labelTime.setText("Time: "+m+":"+s);
+	}
+	public void stopTime() {
+		labelTime.setForeground(Color.RED);
+		cronometer.noRun();
+		cronometer.stop();
+		buttonSelect.setEnabled(true);
+		playButton.setEnabled(true);
 	}
 }
 

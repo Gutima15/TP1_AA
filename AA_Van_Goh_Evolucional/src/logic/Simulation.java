@@ -26,24 +26,21 @@ public class Simulation extends Thread{
 	private Factory factory;
 	SimilitaryAlgorithm calculator;
 	private int useGray;
-	
+	private int sectors;
+	private int useGoal;
 	private MyImage bestImage;
 	private MyImage worstImage;
 	private MyImage currentImage;
-	
 	private ArrayList<MyImage> gen1;
 	private ArrayList<MyImage> gen2;
 	private ArrayList<MyImage> bestHalf;
 	private ArrayList<MyImage> worstHalf;
-	
 	Double similarityBest;
 	Double similarityWorst;
 	Double result;
     String bestImageName;
     
-    private File directory;
-	
-	public Simulation(MainFrame mainFrame,SimilitaryAlgorithm calculator, BufferedImage goalImage,int generations,int population,int useGray) {
+	public Simulation(MainFrame mainFrame,SimilitaryAlgorithm calculator, BufferedImage goalImage,int generations,int population,int useGray,int sectors, int useGoal) {
 		factory = new Factory();
 		numbers = new ArrayList<Integer>();
 		bestImages = new ArrayList<MyImage>();
@@ -54,6 +51,8 @@ public class Simulation extends Thread{
 		this.mainFrame = mainFrame;
 		this.calculator = calculator;
 		this.useGray = useGray;
+		this.sectors = sectors;
+		this.useGoal = useGoal;
 		
 		bestImage = null;
 		worstImage = null;
@@ -68,13 +67,10 @@ public class Simulation extends Thread{
 		similarityBest = 0.0;
 		similarityWorst = 100.0;
 		bestImageName = "";
-		
-		directory = new File("C:\\Users\\josue\\Desktop\\Best Images");
 	}
 	public void run() {
-		directory.mkdir();
 		for(int k = 0; k < population; k++) {
-		    gen1.add(new MyImage(factory.getRandomPicture(goalImage.getImage().getWidth(),goalImage.getImage().getHeight(),useGray),8));	
+		    gen1.add(new MyImage(factory.getRandomPicture(goalImage.getImage().getWidth(),goalImage.getImage().getHeight(),useGray),sectors));	
 		}
 		for(int i = 1; i < generations+1;i++) {
 			for(int j = 0; j < population; j++) {
@@ -133,14 +129,8 @@ public class Simulation extends Thread{
 			bestImage = null;
 			worstImage = null;
 			currentImage = null;
-			/*
-			try{
-				Thread.sleep(5000);
-			}catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			*/
 		}
+		mainFrame.stopTime();
 	}
 	public void getNextGeneration() 
 	{
@@ -148,68 +138,60 @@ public class Simulation extends Thread{
 		MyImage randomImage2 = null;
 		int r1 = 0;
 		int r2 = 0;
-		for(int j = 0;j<population/2;j++) {
-			r1 = (int)(Math.random() * worstHalf.size());
-			r2 = (int)(Math.random() * worstHalf.size());
-			randomImage1 = worstHalf.get(r1);
-			randomImage2 = worstHalf.get(r2);
-			gen1.add(factory.crossWorstImages(randomImage1, randomImage2));
+		if(useGoal == 0) {
+			for(int j = 0;j<population/2;j++) {
+				r1 = (int)(Math.random() * worstHalf.size());
+				r2 = (int)(Math.random() * worstHalf.size());
+				randomImage1 = worstHalf.get(r1);
+				randomImage2 = worstHalf.get(r2);
+				gen1.add(factory.crossWorstImages(randomImage1, randomImage2));
+			}
+			for(int i = population/2;i<(population-1);i++) {
+				r1 = (int)(Math.random() * bestHalf.size());
+				r2 = (int)(Math.random() * bestHalf.size());
+				randomImage1 = bestHalf.get(r1);
+				randomImage2 = bestHalf.get(r2);
+				gen1.add(factory.crossBestImages(randomImage1, randomImage2,sectors));
+			}
 		}
-		for(int i = population/2;i<(population-1);i++) {
-			r1 = (int)(Math.random() * bestHalf.size());
-			r2 = (int)(Math.random() * bestHalf.size());
-			randomImage1 = bestHalf.get(r1);
-			randomImage2 = bestHalf.get(r2);
-			gen1.add(factory.crossBestImages(randomImage1, randomImage2));
+		else {
+			for(int u = 0;u<(population-1);u++) {
+				r1 = (int)(Math.random() * gen2.size());
+				r2 = (int)(Math.random() * gen2.size());
+				randomImage1 = gen2.get(r1);
+				randomImage2 = gen2.get(r2);
+				gen1.add(factory.crossDirected(randomImage1, randomImage2,goalImage));
+			}
 		}
-		gen1.add(new MyImage(factory.mutate1(worstImage.getImage()),8));
+		gen1.add(new MyImage(factory.mutate1(worstImage.getImage()),sectors));
 	}
 	
 	public void fillMatrix() {
-		BufferedImage sectionCurrent = new BufferedImage((currentImage.getImage().getWidth())/8,(currentImage.getImage().getHeight())/8,BufferedImage.TYPE_INT_RGB);
+		BufferedImage sectionCurrent = new BufferedImage((currentImage.getImage().getWidth())/8,(currentImage.getImage().getHeight())/sectors,BufferedImage.TYPE_INT_RGB);
 		Graphics g = sectionCurrent.getGraphics();
-		BufferedImage sectionGoal = new BufferedImage((goalImage.getImage().getWidth())/8,(goalImage.getImage().getHeight())/8,BufferedImage.TYPE_INT_RGB);
+		BufferedImage sectionGoal = new BufferedImage((goalImage.getImage().getWidth())/8,(goalImage.getImage().getHeight())/sectors,BufferedImage.TYPE_INT_RGB);
 		Graphics g2 = sectionGoal.getGraphics();
-		Double matrix[][] = new Double[8][8];
+		Double matrix[][] = new Double[sectors][sectors];
 		int x;
 		int y;
-		int c = (currentImage.getImage().getWidth()/8)-1;
-		//System.out.println("c: "+c);
-		for(int i = 0; i<8;i++) {
-			for(int j = 0; j<8;j++) {
-				//System.out.println("SECTOR:  i: "+i+" j: "+j);
-				x = ((i+1)*(currentImage.getImage().getWidth()/8)-1);
-				y = ((j+1)*(currentImage.getImage().getWidth()/8)-1);
-				//System.out.println("Medidas correspondientes x: "+x+" y: "+y);
+		int c = (currentImage.getImage().getWidth()/sectors)-1;
+		for(int i = 0; i<sectors;i++) {
+			for(int j = 0; j<sectors;j++) {
+				x = ((i+1)*(currentImage.getImage().getWidth()/sectors)-1);
+				y = ((j+1)*(currentImage.getImage().getWidth()/sectors)-1);
 				for(int m = x-c;m<=x;m++) {
 					for(int n = y-c;n<=y;n++) {
-						//System.out.print("Inicial  m: "+m+" n: "+n);
 						g.setColor(new Color(currentImage.getImage().getRGB(m, n)));
 						g.fillRect((m-(i*(c+1))), (n-(j*(c+1))), 1, 1);
-						//System.out.print("    Meta  m: "+(m-(i*(c+1)))+" n: "+(n-(j*(c+1))));
 						g2.setColor(new Color(goalImage.getImage().getRGB(m, n)));
 						g2.fillRect(m-(i*(c+1)), n-(j*(c+1)), 1, 1);
-						//System.out.println("");
 					}
 				}
 				Double result = calculator.calculate(sectionGoal, sectionCurrent);
 				matrix[i][j] = result;
-				//System.out.println("RESULTADO EN i="+i+" j="+j+"  "+result);
 			}	
 		}
 		currentImage.setMatrix(matrix);
-	}
-	
-	public BufferedImage searchImage(String address) 
-	{
-		BufferedImage image = null;
-		try {
-			image = ImageIO.read(new File(address));
-		}
-		catch(IOException e) {
-			System.out.println("Imagen no encontrada");
-		}
-		return image;
 	}
 }
 

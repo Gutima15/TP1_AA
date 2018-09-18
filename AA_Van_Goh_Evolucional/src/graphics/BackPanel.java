@@ -23,7 +23,7 @@ public class BackPanel extends JPanel{
 			image = ImageIO.read(new File("background.jpg"));
 		}
 		catch(IOException e) {
-			System.out.println("Imagen no encontrada");
+			//System.out.println("Imagen no encontrada");
 		}
 	}
 	public void paintComponent(Graphics g) {
@@ -34,5 +34,7 @@ public class BackPanel extends JPanel{
 		g.fillRect(67, 681, 508, 29);
 		g.fillRect(684, 205, 142, 26);
 		g.fillRect(853, 681, 251, 36);
+		g.fillRect(1084, 216, 113, 23);
+		g.fillRect(1084, 50, 205, 51);
 	}
 }

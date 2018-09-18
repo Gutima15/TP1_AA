@@ -19,7 +19,7 @@ public class Launcher {
 		BufferedImage img2 = factory.searchImage("C:\\Users\\josue\\Desktop\\4x4_2.png");
 		MyImage myimage1 = new MyImage(img1,4);
 		MyImage myimage2 = new MyImage(img2,4);
-		BufferedImage img3 = factory.cross8x8(myimage1,myimage2).getImage();
+		BufferedImage img3 = factory.crossSectorized(myimage1,myimage2,4).getImage();
 		File fichero = new File("C:\\Users\\josue\\Desktop\\result.png");
 		try {
 			ImageIO.write(img3, "png",fichero);
