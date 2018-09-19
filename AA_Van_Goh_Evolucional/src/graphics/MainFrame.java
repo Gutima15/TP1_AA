@@ -78,6 +78,7 @@ public class MainFrame extends JFrame {
 	private BufferedImage goalImage;
 	private int generations;
 	private int population;
+	private int mutation;
 	private Simulation simulation;
 	private Cronometer cronometer;
 	
@@ -86,6 +87,7 @@ public class MainFrame extends JFrame {
 	private int selectedSector;
 
 	private JCheckBox useGoalImage;
+	private JTextField mutationField;
 	
 	public static void main(String[] args) 
 	{
@@ -174,7 +176,7 @@ public class MainFrame extends JFrame {
 		labelPercentage = new JLabel("0%");
 		labelPercentage.setFont(new Font("Tahoma", Font.BOLD, 20));
 		labelPercentage.setForeground(Color.CYAN);
-		labelPercentage.setBounds(263, 94, 125, 31);
+		labelPercentage.setBounds(285, 94, 125, 31);
 		contentPane.add(labelPercentage);
 		
 		playButton = new JButton(new ImageIcon(play));
@@ -228,24 +230,24 @@ public class MainFrame extends JFrame {
 		JLabel lblNewLabel_3 = new JLabel("GENERATIONS");
 		lblNewLabel_3.setForeground(Color.GREEN);
 		lblNewLabel_3.setFont(new Font("Tahoma", Font.BOLD, 20));
-		lblNewLabel_3.setBounds(689, 170, 158, 32);
+		lblNewLabel_3.setBounds(690, 136, 158, 32);
 		contentPane.add(lblNewLabel_3);
 		
 		JLabel lblNewLabel_4 = new JLabel("POPULATION");
 		lblNewLabel_4.setFont(new Font("Tahoma", Font.BOLD, 20));
 		lblNewLabel_4.setForeground(Color.GREEN);
-		lblNewLabel_4.setBounds(689, 197, 142, 42);
+		lblNewLabel_4.setBounds(689, 170, 142, 32);
 		lblNewLabel_4.setBackground(Color.BLACK);
 		contentPane.add(lblNewLabel_4);
 		
 		
 		gensField = new JTextField();
 		gensField.setFont(new Font("Tahoma", Font.BOLD, 20));
-		gensField.setBounds(858, 172, 81, 29);
+		gensField.setBounds(858, 136, 81, 29);
 		contentPane.add(gensField);
 		
 		popField = new JTextField();
-		popField.setBounds(858, 208, 81, 29);
+		popField.setBounds(858, 172, 81, 29);
 		popField.setFont(new Font("Tahoma", Font.BOLD, 20));
 		contentPane.add(popField);
 		
@@ -272,11 +274,11 @@ public class MainFrame extends JFrame {
 		checkBox.setForeground(Color.CYAN);
 		checkBox.setBackground(new Color(50,50,50));
 		checkBox.setFont(new Font("Tahoma", Font.BOLD, 20));
-		checkBox.setBounds(689, 102, 205, 23);
+		checkBox.setBounds(1084, 94, 205, 23);
 		contentPane.add(checkBox);
 		
 		buttonUpdate = new JButton(new ImageIcon(update));
-		buttonUpdate.setBounds(775, 50, 38, 36);
+		buttonUpdate.setBounds(785, 50, 38, 36);
 		buttonUpdate.setBackground(Color.CYAN);
 		
 		buttonUpdate.addActionListener(new ActionListener() 
@@ -310,7 +312,7 @@ public class MainFrame extends JFrame {
 		contentPane.add(buttonUpdate);
 		
 		buttonStop = new JButton(new ImageIcon(stop));
-		buttonStop.setBounds(732, 50, 38, 36);
+		buttonStop.setBounds(737, 50, 38, 36);
 		buttonStop.setBackground(Color.CYAN);
 		buttonStop.addActionListener(new ActionListener() 
 		{
@@ -325,7 +327,7 @@ public class MainFrame extends JFrame {
 		contentPane.add(buttonStop);
 		
 		labelTime = new JLabel("Time: 00:00");
-		labelTime.setBounds(1084, 50, 205, 51);
+		labelTime.setBounds(1084, 16, 205, 51);
 		labelTime.setFont(new Font("Tahoma", Font.BOLD, 30));
 		labelTime.setForeground(Color.CYAN);
 		contentPane.add(labelTime);
@@ -346,11 +348,23 @@ public class MainFrame extends JFrame {
 		contentPane.add(lblSectors);
 		
 		useGoalImage = new JCheckBox("USE GOAL IMAGE WHEN CROSSING");
-		useGoalImage.setBounds(689, 136, 319, 23);
+		useGoalImage.setBounds(689, 100, 319, 23);
 		useGoalImage.setForeground(Color.CYAN);
 		useGoalImage.setBackground(new Color(50,50,50));
 		useGoalImage.setFont(new Font("Tahoma", Font.BOLD, 16));
 		contentPane.add(useGoalImage);
+		
+		JLabel lblNewLabel_5 = new JLabel("MUTATION %");
+		lblNewLabel_5.setForeground(Color.GREEN);
+		lblNewLabel_5.setBackground(Color.DARK_GRAY);
+		lblNewLabel_5.setFont(new Font("Tahoma", Font.BOLD, 20));
+		lblNewLabel_5.setBounds(689, 210, 151, 29);
+		contentPane.add(lblNewLabel_5);
+		
+		mutationField = new JTextField();
+		mutationField.setFont(new Font("Tahoma", Font.BOLD, 20));
+		mutationField.setBounds(858, 207, 81, 29);
+		contentPane.add(mutationField);
 	}
 
 	private void setDefaultValues() 
@@ -376,7 +390,7 @@ public class MainFrame extends JFrame {
 			stop = ImageIO.read(new File("stop.png"));
 		}
 		catch(IOException e) {
-			//System.out.println("Imagen no encontrada");
+			
 		}
 	}
 	
@@ -384,12 +398,15 @@ public class MainFrame extends JFrame {
 	{
 		String gens = gensField.getText();
 		String pop = popField.getText();
-		if(isNumeric(gens) == true && isNumeric(pop) == true) {
+		String mut = mutationField.getText();
+		if(isNumeric(gens) == true && isNumeric(pop) == true && isNumeric(mut) == true) {
 			int g = Integer.parseInt(gens);
 			int p = Integer.parseInt(pop);
-			if(g > 0 && p > 0) {
+			int m = Integer.parseInt(mut);
+			if(g > 0 && p > 0 && m > 0 && m <= 100) {
 				generations = Integer.parseInt(gens);
 				population = Integer.parseInt(pop);
+				mutation = Integer.parseInt(mut);
 				return true;	
 			}
 			else {
@@ -437,7 +454,7 @@ public class MainFrame extends JFrame {
 		if(useGoalImage.isSelected() == true) {
 			useGoal = 1;
 		}
-		simulation = new Simulation(this,calculator,goalImage,generations,population,useGray,selectedSector,useGoal);
+		simulation = new Simulation(this,calculator,goalImage,generations,population,useGray,selectedSector,useGoal,mutation);
 		cronometer = new Cronometer(this);
 		labelTime.setForeground(Color.CYAN);
 		simulation.start();

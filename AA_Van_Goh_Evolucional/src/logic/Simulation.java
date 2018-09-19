@@ -28,6 +28,7 @@ public class Simulation extends Thread{
 	private int useGray;
 	private int sectors;
 	private int useGoal;
+	private int mutation;
 	private MyImage bestImage;
 	private MyImage worstImage;
 	private MyImage currentImage;
@@ -40,7 +41,7 @@ public class Simulation extends Thread{
 	Double result;
     String bestImageName;
     
-	public Simulation(MainFrame mainFrame,SimilitaryAlgorithm calculator, BufferedImage goalImage,int generations,int population,int useGray,int sectors, int useGoal) {
+	public Simulation(MainFrame mainFrame,SimilitaryAlgorithm calculator, BufferedImage goalImage,int generations,int population,int useGray,int sectors, int useGoal, int mutation) {
 		factory = new Factory();
 		numbers = new ArrayList<Integer>();
 		bestImages = new ArrayList<MyImage>();
@@ -53,6 +54,7 @@ public class Simulation extends Thread{
 		this.useGray = useGray;
 		this.sectors = sectors;
 		this.useGoal = useGoal;
+		this.mutation = mutation;
 		
 		bestImage = null;
 		worstImage = null;
@@ -138,32 +140,55 @@ public class Simulation extends Thread{
 		MyImage randomImage2 = null;
 		int r1 = 0;
 		int r2 = 0;
+		Double n = (population/(population*(mutation*0.01)));
+		int numberForMutation = n.intValue();
 		if(useGoal == 0) {
 			for(int j = 0;j<population/2;j++) {
-				r1 = (int)(Math.random() * worstHalf.size());
-				r2 = (int)(Math.random() * worstHalf.size());
-				randomImage1 = worstHalf.get(r1);
-				randomImage2 = worstHalf.get(r2);
-				gen1.add(factory.crossWorstImages(randomImage1, randomImage2));
+				if(j%numberForMutation == 0) {
+					r1 = (int)(Math.random() * worstHalf.size());
+					randomImage1 = worstHalf.get(r1);
+					gen1.add(new MyImage(factory.mutate(randomImage1.getImage(), useGray),2));
+				}
+				else {
+					r1 = (int)(Math.random() * worstHalf.size());
+					r2 = (int)(Math.random() * worstHalf.size());
+					randomImage1 = worstHalf.get(r1);
+					randomImage2 = worstHalf.get(r2);
+					gen1.add(factory.crossWorstImages(randomImage1, randomImage2));
+				}
 			}
 			for(int i = population/2;i<(population-1);i++) {
-				r1 = (int)(Math.random() * bestHalf.size());
-				r2 = (int)(Math.random() * bestHalf.size());
-				randomImage1 = bestHalf.get(r1);
-				randomImage2 = bestHalf.get(r2);
-				gen1.add(factory.crossBestImages(randomImage1, randomImage2,sectors));
+				if(i%numberForMutation == 0) {
+					r1 = (int)(Math.random() * worstHalf.size());
+					randomImage1 = worstHalf.get(r1);
+					gen1.add(new MyImage(factory.mutate(randomImage1.getImage(), useGray),2));
+				}
+				else {
+					r1 = (int)(Math.random() * bestHalf.size());
+					r2 = (int)(Math.random() * bestHalf.size());
+					randomImage1 = bestHalf.get(r1);
+					randomImage2 = bestHalf.get(r2);
+					gen1.add(factory.crossBestImages(randomImage1, randomImage2,sectors));
+				}
 			}
 		}
 		else {
 			for(int u = 0;u<(population-1);u++) {
-				r1 = (int)(Math.random() * gen2.size());
-				r2 = (int)(Math.random() * gen2.size());
-				randomImage1 = gen2.get(r1);
-				randomImage2 = gen2.get(r2);
-				gen1.add(factory.crossDirected(randomImage1, randomImage2,goalImage));
+				if(u%numberForMutation == 0) {
+					r1 = (int)(Math.random() * worstHalf.size());
+					randomImage1 = worstHalf.get(r1);
+					gen1.add(new MyImage(factory.mutate(randomImage1.getImage(), useGray),2));
+				}
+				else {
+					r1 = (int)(Math.random() * gen2.size());
+					r2 = (int)(Math.random() * gen2.size());
+					randomImage1 = gen2.get(r1);
+					randomImage2 = gen2.get(r2);
+					gen1.add(factory.crossDirected(randomImage1, randomImage2,goalImage));	
+				}
 			}
 		}
-		gen1.add(new MyImage(factory.mutate1(worstImage.getImage()),sectors));
+		gen1.add(new MyImage(factory.mutate(worstImage.getImage(),useGray),sectors));
 	}
 	
 	public void fillMatrix() {

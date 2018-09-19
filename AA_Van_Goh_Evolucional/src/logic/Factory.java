@@ -563,13 +563,23 @@ public class Factory {
 		}
 		return image;
 	}
-    public BufferedImage mutate1(BufferedImage image1){
+    public BufferedImage mutate(BufferedImage image1, int useGray) {
+    	int c = (int)(Math.random() * 2);
+    	if(c == 0) {
+    		return mutate1(image1,useGray);
+    	}
+        if(c == 1) {
+        	return mutate2(image1);
+    	}
+        return null;
+    }
+    public BufferedImage mutate3(BufferedImage image1){
         Graphics g = image1.getGraphics();
         for(int i = 0;i<32;i++) {
             for(int k = 0;k<32;k++) {
-              int mutateProbability = (int)(Math.random() * 3 + 1);
+              int mutateProbability = (int)(Math.random() * 3);
               int randomGray = (int)(Math.random() * 255);
-                if(mutateProbability ==1) {
+                if(mutateProbability ==0) {
                     g.setColor(new Color(randomGray, randomGray, randomGray));
                     g.fillRect(i, k, 1, 1);
 		        }
@@ -587,6 +597,40 @@ public class Factory {
 	        }
         }
         return result;
+    }
+    public BufferedImage mutate1(BufferedImage image1, int useGray){
+        Graphics g = image1.getGraphics();
+        if(useGray == 0) {
+	        for(int i = 0;i<image1.getWidth();i++) {
+	            for(int k = 0;k<image1.getHeight();k++) {
+	              int mutateProbability = (int)(Math.random()*4);
+	              int randomRGB = (int)(Math.random()*255);
+	                if(mutateProbability ==0) { //si es 1, se pasa a grises
+	                    g.setColor(new Color(randomRGB, randomRGB, randomRGB));
+	                    g.fillRect(i, k, 1, 1);
+			        }
+	                if(mutateProbability ==1) { //si es 2, se cambia el azul
+	                    Color colorP = new Color(image1.getRGB(i, k));
+	                    g.setColor(new Color(colorP.getRed(), colorP.getGreen(), randomRGB));
+	                    g.fillRect(i, k, 1, 1);
+			        }
+	                if(mutateProbability ==2) { //si es 3, se cambia el rojo
+	                    Color colorP = new Color(image1.getRGB(i, k));
+	                    g.setColor(new Color(randomRGB, colorP.getGreen(), colorP.getBlue()));
+	                    g.fillRect(i, k, 1, 1);
+			        }
+	                if(mutateProbability ==3) { //si es 4, se cambia el verde
+	                    Color colorP = new Color(image1.getRGB(i, k));
+	                    g.setColor(new Color(colorP.getRed(), randomRGB, colorP.getBlue()));
+	                    g.fillRect(i, k, 1, 1);
+			        }
+		        }
+	        }
+        }
+        else {
+        	return mutate3(image1);
+        }
+        return image1;
     }
 }
 
